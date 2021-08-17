@@ -11,7 +11,7 @@ It should be possible to do *all* CS 61 problem sets on CS 61 Docker.
 Advantages of Docker:
 
 * Docker can start and stop virtual machines incredibly quickly.
-* Docker-based virtual machines are leaner and take less space on your machine.
+* Docker-based virtual machines are small and occupy little space on your machine.
 * With Docker, you can easily *edit* your code in your home environment, but
   *compile and run* it on a Linux host.
 
@@ -114,13 +114,13 @@ Explanation:
 Here’s an example session:
 
 ```shellsession
-$ docker run -it --rm -v ~/cs61-lectures:/home/cs61-user/cs61-lectures cs61:latest
+$ docker run -it --platform linux/amd64 --rm -v ~/cs61-psets:/home/cs61-user/cs61-psets cs61:latest
 cs61-user@a15e6c4c8dbe:~$ ls
-cs61-lectures
+cs61-psets
 cs61-user@a15e6c4c8dbe:~$ echo "Hello, world"
 Hello, world
 cs61-user@a15e6c4c8dbe:~$ cs61-docker-version
-6
+7
 cs61-user@a15e6c4c8dbe:~$ exit
 exit
 $ 

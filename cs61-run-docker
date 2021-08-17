@@ -4,14 +4,26 @@ maindir=""
 destdir=cs61-psets
 
 fresh=
-if test "$1" = "-f" -o "$1" = "--fresh"; then
-    fresh=1
-    shift
-fi
-if test "$#" -ne 0; then
-    echo "Usage: cs61-run-docker [-f | --fresh]" 1>&2
-    exit 1
-fi
+verbose=false
+while test "$#" -ne 0; do
+    if test "$1" = "-f" -o "$1" = "--fresh"; then
+        fresh=1
+        shift
+    elif test "$1" = "-V" -o "$1" = "--verbose"; then
+        verbose=true
+        shift
+    else
+        echo "Usage: cs61-run-docker [-f|--fresh] [-V|--verbose]" 1>&2
+        exit 1
+    fi
+done
+
+vexec () {
+    if $verbose; then
+        echo "$@"
+    fi
+    exec "$@"
+}
 
 if stat --format %i / >/dev/null 2>&1; then
     statformatarg="--format"
@@ -37,6 +49,13 @@ if test -z "$maindir" && expr "${BASH_SOURCE[0]}" : / >/dev/null 2>&1; then
     subdir=""
 fi
 
+ssharg=
+sshenvarg=
+if test -n "$SSH_AUTH_SOCK" -a "`uname`" = Darwin; then
+    ssharg=" -v /run/host-services/ssh-auth.sock:/run/host-services/ssh-auth.sock"
+    sshenvarg=" -e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock"
+fi
+
 if test -n "$maindir" -a -z "$fresh"; then
     existing_image="`docker ps -f status=running -f ancestor=cs61:latest -f volume=/host_mnt"$maindir" --no-trunc --format "{{.CreatedAt}},{{.ID}}" | sort -r | head -n 1`"
     if test -n "$existing_image"; then
@@ -46,7 +65,7 @@ if test -n "$maindir" -a -z "$fresh"; then
         echo "* Using running container $image12, created $created_at" 1>&2
         echo "- To start a new container, exit then \`cs61-run-docker -f\`" 1>&2
         echo "- To kill this container, exit then \`docker kill $image12\`" 1>&2
-        exec docker exec -it $image /bin/bash
+        vexec docker exec -it $image$sshenvarg /bin/bash
     fi
 fi
 
@@ -68,7 +87,7 @@ elif test -x /bin/netstat; then
 fi
 
 if test -n "$maindir"; then
-    exec docker run -it --platform linux/amd64 --rm --cap-add=SYS_PTRACE --cap-add=NET_ADMIN --security-opt seccomp=unconfined -v "$maindir":/home/cs61-user/$destdir -w "/home/cs61-user/$destdir$subdir" $netarg cs61:latest
+    vexec docker run -it --platform linux/amd64 --rm --cap-add=SYS_PTRACE --cap-add=NET_ADMIN --security-opt seccomp=unconfined -v "$maindir":/home/cs61-user/$destdir$ssharg -w "/home/cs61-user/$destdir$subdir" $netarg$sshenvarg cs61:latest
 else
-    exec docker run -it --platform linux/amd64 --rm --cap-add=SYS_PTRACE --cap-add=NET_ADMIN --security-opt seccomp=unconfined $netarg cs61:latest
+    vexec docker run -it --platform linux/amd64 --rm --cap-add=SYS_PTRACE --cap-add=NET_ADMIN --security-opt seccomp=unconfined $netarg$sshenvarg cs61:latest
 fi
