@@ -1,0 +1,10 @@
+accessor
+add
+addin
+inserter[0-9]
+intgen
+objects
+testqs[0-9]
+qs
+qs.cmi
+qs.cmo
