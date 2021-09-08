@@ -1,9 +1,10 @@
-PROGRAMS = objects intgen inserter0 inserter1 inserter2 \
-	inserter3 inserter4 inserter5 inserter6 accessor
+PROGRAMS = objects
 all: $(PROGRAMS)
 
 TESTQSPROGRAMS = testqs0 testqs1 testqs2 testqs3 testqs4 testqs5 testqs6
-ALLPROGRAMS = $(PROGRAMS) $(TESTQSPROGRAMS)
+ALLPROGRAMS = $(PROGRAMS) $(TESTQSPROGRAMS) \
+	intgen accessor inserter0 inserter1 inserter2 \
+	inserter3 inserter4 inserter5 inserter6 accessor
 
 include ../common/rules.mk
 
@@ -26,52 +27,21 @@ addf%.o: addf%.cc $(BUILDSTAMP)
 objects intgen inserter0 inserter1 inserter2 inserter3 \
 inserter4 inserter5 inserter6 accessor: \
 %: %.o hexdump.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
-
-testaccess: testaccess.o qslib.o allowexec.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
-
-testinsert0: testinsert0.o qslib.o allowexec.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
-
-testinsert1: testinsert1.o qslib.o allowexec.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
-
-testinsert2: testinsert2.o qslib.o allowexec.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^ $(LIBS)
 
 add: add.o addf.o hexdump.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^ $(LIBS)
 
 add%: add.o addf%.o hexdump.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^ $(LIBS)
 
 addin: addin.o hexdump.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^ $(LIBS)
 
 testqs: $(TESTQSPROGRAMS)
 
-testqs0: testqs0.o qslib.o allowexec.o hexdump.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
-
-testqs1: testqs1.o qslib.o allowexec.o hexdump.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
-
-testqs2: testqs2.o qslib.o allowexec.o hexdump.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
-
-testqs3: testqs3.o qslib.o allowexec.o hexdump.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
-
-testqs4: testqs4.o qslib.o allowexec.o hexdump.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
-
-testqs5: testqs5.o qslib.o allowexec.o hexdump.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
-
-testqs6: testqs6.o qslib.o allowexec.o hexdump.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
-
+testqs%: testqs%.o qslib.o allowexec.o hexdump.o
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^ $(LIBS)
 
 
 clean:
