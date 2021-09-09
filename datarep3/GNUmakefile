@@ -1,4 +1,4 @@
-PROGRAMS = sizes sizeof compounds
+PROGRAMS = structs accessor mb0 mb1 mb2 mb3 mb4
 all: $(PROGRAMS)
 
 ALLPROGRAMS = $(PROGRAMS)
@@ -15,9 +15,12 @@ include ../common/rules.mk
 
 # Rules for making executables (runnable programs) from object files
 
-sizes sizeof compounds: \
+structs accessor: \
 %: %.o hexdump.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
+
+mb%: mb%.o mb-driver.o hexdump.o
+	$(CXX) $(CXXFLAGS) -pthread $(LDFLAGS) $(O) -o $@ $^
 
 
 clean:
