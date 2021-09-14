@@ -7,6 +7,7 @@ accessor
 intrep
 mb[0-9]
 mb[0-9][st]
+ptrarith
 ubsafeloop
 ubsignedinc
 ubsignedloop

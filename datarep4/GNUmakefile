@@ -1,10 +1,10 @@
-PROGRAMS = mb0 mb1 mb2 mb2s mb2t intrep \
+PROGRAMS = mb0 mb1 mb2 mb2s mb2t ptrarith intrep \
 	ubsignedinc ubsignedinc-noopt \
 	ubsignedloop ubsignedloop-clang-noopt \
 	ubunsignedloop ubsafeloop
 all: $(PROGRAMS)
 
-BASEPROGRAMS = accessor intrep ubsignedinc ubsignedloop ubsafeloop ubunsignedloop
+BASEPROGRAMS = accessor intrep ptrarith ubsignedinc ubsignedloop ubsafeloop ubunsignedloop
 ALLPROGRAMS = $(PROGRAMS) accessor mb3 mb4
 
 variants = $(1) $(addsuffix -noopt,$(1)) \
