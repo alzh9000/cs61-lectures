@@ -1,7 +1,6 @@
 PROGRAMS = mb0 mb1 mb2 mb2s mb2t ptrarith intrep \
-	ubsignedinc ubsignedinc-noopt \
-	ubsignedloop ubsignedloop-clang-noopt \
-	ubunsignedloop ubsafeloop
+	ubsignedinc ubsignedinc-clang-noopt \
+	ubsignedloop ubunsignedloop ubsafeloop
 all: $(PROGRAMS)
 
 BASEPROGRAMS = accessor intrep ptrarith ubsignedinc ubsignedloop ubsafeloop ubunsignedloop

@@ -5,8 +5,13 @@
 #include "hexdump.hh"
 
 int main(int argc, char** argv) {
-    assert(argc >= 2);
-    int x = strtol(argv[1], nullptr, 0);
+    int x;
+    if (argc >= 2) {
+	x = strtol(argv[1], nullptr, 0);
+    } else {
+	fprintf(stderr, "Usage: %s NUMBER\n", argv[0]);
+	exit(1);
+    }
 
     assert(x + 1 > x);
     printf("%d + 1 > %d - assertion passed\n", x, x);
