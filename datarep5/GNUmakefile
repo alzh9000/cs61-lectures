@@ -1,8 +1,13 @@
-PROGRAMS = mb0 mb1 mb2 mb2s mb2t ptrarith intrep \
-	ubsignedinc ubsignedinc-clang-noopt
+PROGRAMS = opt1 opt1-noopt opt2 opt2-noopt \
+	ubsignedinc ubsignedinc-clang-noopt \
+	ubsignedloop ubsignedloop-noopt \
+	ubunsignedloop ubunsignedloop-noopt \
+	ubsafeloop ubsafeloop-noopt \
+	ubtable-gcc ubtable-gcc-noopt \
+	wtf
 all: $(PROGRAMS)
 
-BASEPROGRAMS = accessor intrep ptrarith ubsignedinc ubsignedloop ubsafeloop ubunsignedloop
+BASEPROGRAMS = opt1 opt2 ubsignedinc ubsignedloop ubunsignedloop ubsafeloop ubtable wtf
 ALLPROGRAMS = $(PROGRAMS) accessor mb3 mb4
 
 variants = $(1) $(addsuffix -noopt,$(1)) \
