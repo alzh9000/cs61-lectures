@@ -21,33 +21,48 @@ endif
 
 # compiler variant
 ifeq ($(COMPILER),clang)
-ifeq ($(origin CC),default)
-ifeq ($(shell if clang --version | grep -e 'LLVM\|clang' >/dev/null; then echo 1; else echo 0; fi),1)
+ ifeq ($(origin CC),default)
+  ifeq ($(shell if clang --version | grep -e 'LLVM\|clang' >/dev/null; then echo 1; else echo 0; fi),1)
 CC = clang
-endif
-endif
-ifeq ($(origin CXX),default)
-ifeq ($(shell if clang++ --version | grep -e 'LLVM\|clang' >/dev/null; then echo 1; else echo 0; fi),1)
+  endif
+ endif
+ ifeq ($(origin CXX),default)
+  ifeq ($(shell if clang++ --version | grep -e 'LLVM\|clang' >/dev/null; then echo 1; else echo 0; fi),1)
 CXX = clang++
-endif
-endif
+  endif
+ endif
 endif
 ifeq ($(COMPILER),gcc)
-ifeq ($(origin CC),default)
-ifeq ($(shell if gcc --version 2>&1 | grep -e 'Free Software' >/dev/null; then echo 1; else echo 0; fi),1)
+ ifeq ($(origin CC),default)
+  ifeq ($(shell if gcc --version 2>&1 | grep -e 'Free Software' >/dev/null; then echo 1; else echo 0; fi),1)
 CC = gcc
-endif
-endif
-ifeq ($(origin CXX),default)
-ifeq ($(shell if g++ --version 2>&1 | grep -e 'Free Software' >/dev/null; then echo 1; else echo 0; fi),1)
+  endif
+ endif
+ ifeq ($(origin CXX),default)
+  ifeq ($(shell if g++ --version 2>&1 | grep -e 'Free Software' >/dev/null; then echo 1; else echo 0; fi),1)
 CXX = g++
-endif
-endif
+  endif
+ endif
 endif
 
 ISCLANG := $(shell if $(CC) --version | grep -e 'LLVM\|clang' >/dev/null; then echo 1; else echo 0; fi)
 ifeq ($(ISCLANG),1)
 BADCXXFLAGS ?= -fno-if-conversion -fno-if-conversion2
+endif
+
+ifeq ($(NEED_CXX_GCC),1)
+GXX_ISCLANG := $(shell if g++ --version | grep -e 'LLVM\|clang' >/dev/null; then echo 1; else echo 0; fi)
+ ifeq ($(GXX_ISCLANG),1)
+  ifeq ($(shell if g++-11 --version 2>/dev/null | grep -e 'Free Software' >/dev/null; then echo 1; else echo 0; fi),1)
+CXX_GCC = g++-11
+  else ifeq ($(shell if g++-10 --version 2>/dev/null | grep -e 'Free Software' >/dev/null; then echo 1; else echo 0; fi),1)
+CXX_GCC = g++-10
+  else
+CXX_GCC = false
+  endif
+ else
+CXX_GCC = g++
+ endif
 endif
 
 # sanitizer arguments
