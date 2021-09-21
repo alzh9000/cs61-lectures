@@ -140,7 +140,7 @@ CXX_LINK_PREREQUISITES = $(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
 
 CLEANASM = 1
 ifeq ($(CLEANASM),1)
-cleanasm = perl -ni -e '$$badsection = !!/\.note\.gnu/ if /^\s+\.section/; print if !/^(?:\# BB|\s+\.cfi|\s+\.p2align|\s+\# =>This|\s+\# kill)/ && !$$badsection' $(1)
+cleanasm = perl -ni -e '$$badsection = !!/\.note\.gnu/ if /^\s+\.section/; print if !/^(?:\# BB|\s+\.cfi|\s+\.p2align|\.LF[BE]|\s+\# =>This|\s+\# kill)/ && !$$badsection' $(1)
 else
 cleanasm = :
 endif
