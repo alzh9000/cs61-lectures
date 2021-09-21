@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
+#include "hexdump.hh"
 
 extern "C" {
 int add(int a, int b);
