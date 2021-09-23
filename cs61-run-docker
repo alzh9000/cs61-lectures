@@ -1,7 +1,7 @@
 #! /bin/bash
 
 maindir=""
-destdir=cs61-psets
+destdir=cs61-lectures
 
 fresh=
 verbose=false

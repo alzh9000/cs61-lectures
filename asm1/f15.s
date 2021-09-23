@@ -1,4 +1,4 @@
-	.file	"f14.cc"
+	.file	"f15.cc"
 	.text
 	.globl	_Z12array_accessPil
 	.type	_Z12array_accessPil, @function

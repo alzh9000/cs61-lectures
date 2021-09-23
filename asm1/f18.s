@@ -1,4 +1,4 @@
-	.file	"f17.cc"
+	.file	"f18.cc"
 	.text
 	.globl	_Z9ptr_arithPil
 	.type	_Z9ptr_arithPil, @function

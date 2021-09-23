@@ -1,4 +1,4 @@
-	.file	"f16.cc"
+	.file	"f17.cc"
 	.text
 	.globl	_Z12array_accessP2prl
 	.type	_Z12array_accessP2prl, @function
