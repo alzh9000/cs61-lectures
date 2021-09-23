@@ -12,26 +12,26 @@
 extern "C" {
 
 int add(int a, int b) {
-    const char* file = "cs61hello.jpg";
-    size_t offset = 0x9efc;
-
-    // Load the file into memory
+    // Open a file
+    const char* file = "Akn_leer.png";
     int fd = open(file, O_RDONLY);
     assert(fd >= 0);
 
+    // Look up its size
     struct stat s;
     int r = fstat(fd, &s);
     assert(r >= 0 && S_ISREG(s.st_mode) && s.st_size > 0);
 
-    void* data = mmap(NULL, s.st_size, PROT_READ | PROT_EXEC, MAP_SHARED, fd, 0);
+    // Load it into memory starting at address `data`
+    void* data = mmap(nullptr, s.st_size, PROT_READ | PROT_EXEC, MAP_SHARED, fd, 0);
     assert(data != MAP_FAILED);
 
     // Obtain address of add function in loaded file
-    uintptr_t data_address = (uintptr_t) data + offset;
-    int (*add_function)(int, int) = (int (*)(int, int)) (data_address);
+    uintptr_t function_address = (uintptr_t) data + 0xede65;
+    int (*function_pointer)(int, int) = (int (*)(int, int)) function_address;
 
     // Call add function
-    return add_function(a, b);
+    return function_pointer(a, b);
 }
 
 }

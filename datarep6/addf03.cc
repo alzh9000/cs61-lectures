@@ -1,7 +1,7 @@
 extern "C" {
 
 int add(long a, long b) {
-    return a + b;
+    return (int) (a + b);
 }
 
 }

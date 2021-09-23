@@ -1,7 +1,7 @@
 PROGRAMS = add $(patsubst addf%.cc,add%,$(sort $(wildcard addf[0-9][0-9].cc))) checksummer
 BUILDABLEASM := $(sort $(patsubst %.cc,%.s,$(wildcard f*.cc)) \
         $(patsubst src/%.cc,%.s,$(wildcard src/f*.cc)))
-all: $(PROGRAMS) checksummer-unsafe $(BUILDABLEASM)
+all: $(PROGRAMS) add-noopt checksummer-unsafe $(BUILDABLEASM)
 
 BASEPROGRAMS = none
 ALLPROGRAMS = $(PROGRAMS)
@@ -92,6 +92,9 @@ $(addsuffix -clang-noopt,$(BASEPROGRAMS)): \
 	clang++ $(CXXFLAGS) $(LDFLAGS) -O0 -o $@ $^
 
 add: add.o addf.o hexdump.o
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
+
+add-noopt: add.o addf-noopt.o hexdump.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
 
 add%: add.o addf%.o hexdump.o
