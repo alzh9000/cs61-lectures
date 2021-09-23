@@ -13,7 +13,7 @@ extern "C" {
 
 int add(int a, int b) {
     // Open a file
-    const char* file = "Akn_leer.png";
+    const char* file = "cs61hello.jpg";
     int fd = open(file, O_RDONLY);
     assert(fd >= 0);
 
@@ -27,7 +27,7 @@ int add(int a, int b) {
     assert(data != MAP_FAILED);
 
     // Obtain address of add function in loaded file
-    uintptr_t function_address = (uintptr_t) data + 0xede65;
+    uintptr_t function_address = (uintptr_t) data + 0x9efc;
     int (*function_pointer)(int, int) = (int (*)(int, int)) function_address;
 
     // Call add function
