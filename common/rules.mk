@@ -151,6 +151,8 @@ flagged_compile = @ARGS=$$(grep '^//!' $< | sed 's/.*!//$(patsubst %,;s/ % */ /,
 
 flagged_compile_S = $(call flagged_compile,$(1),$(2),$(filter-out -g,$(3) -S)) && { $(call cleanasm,$(2)); }
 
+flagged_compile_c = $(call flagged_compile,$(1),$(2),$(3) -c)
+
 
 PERCENT := %
 
