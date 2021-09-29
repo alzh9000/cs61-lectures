@@ -100,7 +100,7 @@ RUN for i in addr2line c++filt cpp-9 g++-9 gcc-9 gcov-9 gcov-dump-9 gcov-tool-9 
   ln -s /usr/bin/x86_64-linux-gnu-g++-9 /usr/x86_64-linux-gnu/bin/g++ && \
   ln -s /usr/bin/x86_64-linux-gnu-gcc-9 /usr/x86_64-linux-gnu/bin/gcc && \
   ln -s /usr/bin/x86_64-linux-gnu-gcc-9 /usr/x86_64-linux-gnu/bin/cc && \
-  ln -s /usr/bin/gdb-multiarch /usr/x86_64-linux-gnu/bin/gdb-multiarch
+  ln -s /usr/bin/gdb-multiarch /usr/x86_64-linux-gnu/bin/gdb
 
 # set up default locale
 RUN locale-gen en_US.UTF-8
