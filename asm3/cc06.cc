@@ -8,6 +8,4 @@ bool nth_bit(int i, unsigned n) {
 
 bool nth_random_bit(unsigned n) {
     return nth_bit(rand(), n);
-    int i = rand();
-    return ((i >> n) & 1) != 0;
 }
