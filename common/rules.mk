@@ -140,7 +140,7 @@ CXX_LINK_PREREQUISITES = $(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
 
 CLEANASM = 1
 ifeq ($(CLEANASM),1)
-cleanasm = perl -ni -e '$$badsection = !!/\.note\.gnu/ if /^\s+\.section/; print if !/^(?:\# BB|\s+\.cfi|\s+\.p2align|\s+\# =>This|\s+\# kill)/ && !$$badsection' $(1)
+cleanasm = perl -ni -e '$$badsection = !!/\.note\.gnu/ if /^\s+\.section/; print if !/^(?:\# BB|\s+\.cfi|\s+\.p2align|\.LF[BE]|\s+\# =>This|\s+\# kill)/ && !$$badsection' $(1)
 else
 cleanasm = :
 endif
@@ -150,6 +150,8 @@ flagged_compile = @ARGS=$$(grep '^//!' $< | sed 's/.*!//$(patsubst %,;s/ % */ /,
 	  $(call xrun,$(CXX) $(3) $$ARGS -o $(2) $(1),COMPILE $$ARGS $(1) -o $(2))
 
 flagged_compile_S = $(call flagged_compile,$(1),$(2),$(filter-out -g,$(3) -S)) && { $(call cleanasm,$(2)); }
+
+flagged_compile_c = $(call flagged_compile,$(1),$(2),$(3) -c)
 
 
 PERCENT := %
