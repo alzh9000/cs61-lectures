@@ -1,6 +1,7 @@
 #include <cstdio>
 
-[[gnu::noinline]] int deref(int* ptr) {
+[[gnu::noinline]]
+int deref(int* ptr) {
 	return *ptr;
 }
 

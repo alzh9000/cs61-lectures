@@ -3,12 +3,10 @@ BUILDABLEASM := $(sort $(patsubst %.cc,%.s,$(wildcard f*.cc cc*.cc deref.cc)) \
         $(patsubst src/%.cc,%.s,$(wildcard src/f*.cc src/cc*.cc)))
 all: $(PROGRAMS) $(BUILDABLEASM) checksummer-unsafe
 
-BASEPROGRAMS = ubsignedinc ubsignedinc2 deref
+BASEPROGRAMS = ubsignedinc ubsignedinc2 deref checksummer
 ALLPROGRAMS = $(PROGRAMS)
 
-variants = $(1) $(addsuffix -noopt,$(1)) \
-	$(addsuffix -clang,$(1)) $(addsuffix -clang-noopt,$(1)) \
-	$(addsuffix -gcc,$(1)) $(addsuffix -gcc-noopt,$(1))
+variants = $(1) $(addsuffix -noopt,$(1)) $(addsuffix -unsafe,$(1))
 
 NEED_CXX_GCC = 1
 PIE ?= 0
@@ -21,6 +19,9 @@ UNSAFEFLAGS := -U_FORTIFY_SOURCE -fno-stack-protector
 # from source files
 %.o: %.cc $(BUILDSTAMP)
 	$(call flagged_compile_c,$<,$@,$(CXXFLAGS))
+
+%-unsafe.o: %.cc $(BUILDSTAMP)
+	$(call flagged_compile_c,$<,$@,$(UNSAFEFLAGS) $(CXXFLAGS))
 
 
 # Rules for making assembly files from source files
@@ -66,20 +67,9 @@ $(addsuffix -clang-noopt,$(BASEPROGRAMS)): \
 %: %.o hexdump.o
 	clang++ $(CXXFLAGS) $(LDFLAGS) -O0 -o $@ $^
 
-add: add.o addf.o hexdump.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
-
-add%: add.o addf%.o hexdump.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
-
-checksummer: checksummer.o hexdump.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
-
-checksummer-unsafe: checksummer-unsafe.o hexdump.o
+$(addsuffix -unsafe,$(BASEPROGRAMS)): \
+%: %.o hexdump.o
 	$(CXX) $(UNSAFEFLAGS) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
-
-mb%: mb%.o mb-driver.o hexdump.o
-	$(CXX) $(CXXFLAGS) -pthread $(LDFLAGS) $(O) -o $@ $^
 
 
 attackfail.txt~: checksummer makeattack.pl

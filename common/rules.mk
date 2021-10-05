@@ -166,6 +166,7 @@ PERCENT := %
 %: %.cc
 %.o: %.cc
 %: %.o
+%.o: %.s
 
 $(BUILDSTAMP):
 	@mkdir -p $(@D)

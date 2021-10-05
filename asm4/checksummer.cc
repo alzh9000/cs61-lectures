@@ -2,17 +2,23 @@
 #include <cctype>
 #include <cstring>
 #include <unistd.h>
-#include <sstream>
+#include <vector>
 #include "hexdump.hh"
 
 // exec_shell(command)
 //   Replace the current process with a process executing a shell command.
 void exec_shell(const char* command) {
-    const char* args[] = {"/bin/sh", "-c", command, nullptr};
+    static const char* args[4];
+    args[0] = "/bin/sh";
+    args[1] = "-c";
+    args[2] = command;
+    args[3] = nullptr;
     execv(args[0], (char**) args);
 }
 
 
+// get_unsigned(buf, idx)
+//   Return the `idx`th unsigned value stored in the aligned `buf`.
 [[gnu::noinline]]
 unsigned get_unsigned(const char* buf, unsigned idx) {
     const unsigned* ubuf = (const unsigned*) buf;
@@ -22,17 +28,14 @@ unsigned get_unsigned(const char* buf, unsigned idx) {
 
 unsigned checksum(const char* str, size_t n) {
     // copy string into local buffer to ensure alignment
-    union {
-        char c[80];
-        unsigned u[20];
-    } buf;
-    memset(&buf, 0, sizeof(buf));
-    memcpy(&buf, str, n);
+    alignas(unsigned) char buf[400];
+    memset(buf, 0, sizeof(buf));
+    memcpy(buf, str, n);
 
     // compute a checksum from the buffer
     unsigned max = 0;
     for (size_t i = 0; i < sizeof(buf) / sizeof(unsigned); ++i) {
-        max += get_unsigned(buf.c, i);
+        max += get_unsigned(buf, i);
     }
     return max;
 }
