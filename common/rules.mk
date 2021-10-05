@@ -69,6 +69,11 @@ endif
 ifndef SAN
 SAN := $(SANITIZE)
 endif
+ifeq ($(SAN),1)
+ ifndef ASAN
+ASAN := $(if $(strip $(shell $(CC) -v 2>&1 | grep 'build=aarch.*target=x86')),,1)
+ endif
+endif
 ifndef TSAN
  ifeq ($(WANT_TSAN),1)
 TSAN := $(SAN)
@@ -82,7 +87,7 @@ CFLAGS += -fsanitize=thread
 CXXFLAGS += -fsanitize=thread
  endif
 else
- ifeq ($(or $(ASAN),$(LSAN),$(LEAKSAN),$(SAN)),1)
+ ifeq ($(or $(ASAN),$(LSAN),$(LEAKSAN)),1)
   ifeq ($(call check_for_sanitizer,address),1)
 CFLAGS += -fsanitize=address
 CXXFLAGS += -fsanitize=address
@@ -145,12 +150,11 @@ else
 cleanasm = :
 endif
 
+DEFAULT_ASM_CXXFLAGS ?= $(O)
 flagged_compile = @ARGS=$$(grep '^//!' $< | sed 's/.*!//$(patsubst %,;s/ % */ /,$(BADCXXFLAGS));s/^ | $$//'); \
 	  if test -z "$$ARGS"; then ARGS="$(DEFAULT_ASM_CXXFLAGS)"; fi; \
 	  $(call xrun,$(CXX) $(3) $$ARGS -o $(2) $(1),COMPILE $$ARGS $(1) -o $(2))
-
 flagged_compile_S = $(call flagged_compile,$(1),$(2),$(filter-out -g,$(3) -S)) && { $(call cleanasm,$(2)); }
-
 flagged_compile_c = $(call flagged_compile,$(1),$(2),$(3) -c)
 
 
