@@ -3,7 +3,8 @@ BUILDABLEASM := $(sort $(patsubst %.cc,%.s,$(wildcard f*.cc cc*.cc deref.cc)) \
         $(patsubst src/%.cc,%.s,$(wildcard src/f*.cc src/cc*.cc)))
 all: $(PROGRAMS) $(BUILDABLEASM) checksummer-unsafe
 
-BASEPROGRAMS = ubsignedinc ubsignedinc2 deref checksummer
+BASEPROGRAMS = ubsignedinc ubsignedinc2 checksummer
+STATICPROGRAMS = deref
 ALLPROGRAMS = $(PROGRAMS)
 
 variants = $(1) $(addsuffix -noopt,$(1)) $(addsuffix -unsafe,$(1))
@@ -45,7 +46,11 @@ UNSAFEFLAGS := -U_FORTIFY_SOURCE -fno-stack-protector
 
 $(BASEPROGRAMS): \
 %: %.o hexdump.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -static $(O) -o $@ $^
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
+
+$(STATICPROGRAMS): \
+%: %.o hexdump.o
+	$(CXX) $(CXXFLAGS) -static $(LDFLAGS) $(O) -o $@ $^
 
 $(addsuffix -clang,$(BASEPROGRAMS)): \
 %: %.o hexdump.o
