@@ -1,3 +1,6 @@
-ubsignedinc
-checksummer
 *-unsafe
+*.s
+checksummer
+deref
+ubsignedinc
+ubsignedinc2

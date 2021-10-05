@@ -102,8 +102,8 @@ CXXFLAGS += -fsanitize=leak
 endif
 ifeq ($(or $(UBSAN),$(SAN)),1)
  ifeq ($(call check_for_sanitizer,undefined),1)
-CFLAGS += -fsanitize=undefined
-CXXFLAGS += -fsanitize=undefined
+CFLAGS += -fsanitize=undefined -fno-sanitize-recover=undefined
+CXXFLAGS += -fsanitize=undefined -fno-sanitize-recover=undefined
  endif
 endif
 
