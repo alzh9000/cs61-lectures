@@ -45,7 +45,7 @@ UNSAFEFLAGS := -U_FORTIFY_SOURCE -fno-stack-protector
 
 $(BASEPROGRAMS): \
 %: %.o hexdump.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -static $(O) -o $@ $^
 
 $(addsuffix -clang,$(BASEPROGRAMS)): \
 %: %.o hexdump.o
@@ -69,7 +69,7 @@ $(addsuffix -clang-noopt,$(BASEPROGRAMS)): \
 
 $(addsuffix -unsafe,$(BASEPROGRAMS)): \
 %: %.o hexdump.o
-	$(CXX) $(UNSAFEFLAGS) $(CXXFLAGS) $(LDFLAGS) $(O) -o $@ $^
+	$(CXX) $(UNSAFEFLAGS) $(CXXFLAGS) $(LDFLAGS) -static $(O) -o $@ $^
 
 
 attackfail.txt~: checksummer makeattack.pl
