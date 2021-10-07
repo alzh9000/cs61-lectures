@@ -99,7 +99,7 @@ class vmiter {
 class ptiter {
   public:
     // Initialize a physical iterator for `pt` with initial virtual address 0.
-    ptiter(x86_64_pagetable* pt);
+    inline ptiter(x86_64_pagetable* pt);
     inline ptiter(const proc* p);
 
     // Return true once `ptiter` has iterated over all page table pages
@@ -135,6 +135,7 @@ class ptiter {
     int level_;
     uintptr_t va_;
 
+    void go(uintptr_t va);
     void down(bool skip);
 };
 
@@ -216,6 +217,10 @@ inline int vmiter::try_map(void* kp, int perm) {
     return try_map((uintptr_t) kp, perm);
 }
 
+inline ptiter::ptiter(x86_64_pagetable* pt)
+    : pt_(pt) {
+    go(0);
+}
 inline ptiter::ptiter(const proc* p)
     : ptiter(p->pagetable) {
 }

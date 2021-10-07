@@ -55,58 +55,29 @@ int rand(int min, int max);
 #define arraysize(array)        (sizeof(array) / sizeof(array[0]))
 
 
-// Type information
+// Arithmetic
 
-// printfmt<T>
-//    `printfmt<T>::spec` defines a printf specifier for type T.
-//    E.g., `printfmt<int>::spec` is `"d"`.
-
-template <typename T> struct printfmt {};
-template <> struct printfmt<bool>           { static constexpr char spec[] = "d"; };
-template <> struct printfmt<char>           { static constexpr char spec[] = "c"; };
-template <> struct printfmt<signed char>    { static constexpr char spec[] = "d"; };
-template <> struct printfmt<unsigned char>  { static constexpr char spec[] = "u"; };
-template <> struct printfmt<short>          { static constexpr char spec[] = "d"; };
-template <> struct printfmt<unsigned short> { static constexpr char spec[] = "u"; };
-template <> struct printfmt<int>            { static constexpr char spec[] = "d"; };
-template <> struct printfmt<unsigned>       { static constexpr char spec[] = "u"; };
-template <> struct printfmt<long>           { static constexpr char spec[] = "ld"; };
-template <> struct printfmt<unsigned long>  { static constexpr char spec[] = "lu"; };
-template <typename T> struct printfmt<T*>   { static constexpr char spec[] = "p"; };
-
-template <typename T> constexpr char printfmt<T*>::spec[];
-
-
-// Min, max, and round-to-multiple operations
-
+// min(a, b, ...)
+//    Return the minimum of the arguments.
 template <typename T>
 inline constexpr T min(T a, T b) {
     return a < b ? a : b;
 }
-template <typename T>
-inline constexpr T min(T a, T b, T c) {
-    return min(min(a, b), c);
+template <typename T, typename... Rest>
+inline constexpr T min(T a, T b, Rest... c) {
+    return min(min(a, b), c...);
 }
+
+// max(a, b, ...)
+//    Return the maximum of the arguments.
 template <typename T>
 inline constexpr T max(T a, T b) {
     return b < a ? a : b;
 }
-template <typename T>
-inline constexpr T max(T a, T b, T c) {
-    return max(max(a, b), c);
+template <typename T, typename... Rest>
+inline constexpr T max(T a, T b, Rest... c) {
+    return max(max(a, b), c...);
 }
-
-template <typename T>
-inline constexpr T round_down(T x, unsigned multiple) {
-    static_assert(std::is_unsigned<T>::value, "T must be unsigned");
-    return x - (x % multiple);
-}
-template <typename T>
-inline constexpr T round_up(T x, unsigned multiple) {
-    static_assert(std::is_unsigned<T>::value, "T must be unsigned");
-    return round_down(x + multiple - 1, multiple);
-}
-
 
 // msb(x)
 //    Return index of most significant one bit in `x`, plus one.
@@ -152,8 +123,28 @@ inline constexpr int lsb(unsigned long long x) {
     return __builtin_ffsll(x);
 }
 
+// round_down(x, m)
+//    Return the largest multiple of `m` less than or equal to `x`.
+//    Equivalently, round `x` down to the nearest multiple of `m`.
+template <typename T>
+inline constexpr T round_down(T x, unsigned m) {
+    static_assert(std::is_unsigned<T>::value, "T must be unsigned");
+    return x - (x % m);
+}
+
+// round_up(x, m)
+//    Return the smallest multiple of `m` greater than or equal to `x`.
+//    Equivalently, round `x` up to the nearest multiple of `m`.
+template <typename T>
+inline constexpr T round_up(T x, unsigned m) {
+    static_assert(std::is_unsigned<T>::value, "T must be unsigned");
+    return round_down(x + m - 1, m);
+}
+
 // round_down_pow2(x)
-//    Round x down to the nearest power of 2.
+//    Return the largest power of 2 less than or equal to `x`.
+//    Equivalently, round `x` down to the nearest power of 2.
+//    Returns 0 if `x == 0`.
 template <typename T>
 inline constexpr T round_down_pow2(T x) {
     static_assert(std::is_unsigned<T>::value, "T must be unsigned");
@@ -161,7 +152,9 @@ inline constexpr T round_down_pow2(T x) {
 }
 
 // round_up_pow2(x)
-//    Round x up to the nearest power of 2.
+//    Return the smallest power of 2 greater than or equal to `x`.
+//    Equivalently, round `x` up to the nearest power of 2.
+//    Returns 0 if `x == 0`.
 template <typename T>
 inline constexpr T round_up_pow2(T x) {
     static_assert(std::is_unsigned<T>::value, "T must be unsigned");
@@ -298,6 +291,28 @@ void error_printf(int color, const char* format, ...)
     __attribute__((noinline, cold));
 void error_printf(const char* format, ...)
     __attribute__((noinline, cold));
+
+
+// Type information
+
+// printfmt<T>
+//    `printfmt<T>::spec` defines a printf specifier for type T.
+//    E.g., `printfmt<int>::spec` is `"d"`.
+
+template <typename T> struct printfmt {};
+template <> struct printfmt<bool>           { static constexpr char spec[] = "d"; };
+template <> struct printfmt<char>           { static constexpr char spec[] = "c"; };
+template <> struct printfmt<signed char>    { static constexpr char spec[] = "d"; };
+template <> struct printfmt<unsigned char>  { static constexpr char spec[] = "u"; };
+template <> struct printfmt<short>          { static constexpr char spec[] = "d"; };
+template <> struct printfmt<unsigned short> { static constexpr char spec[] = "u"; };
+template <> struct printfmt<int>            { static constexpr char spec[] = "d"; };
+template <> struct printfmt<unsigned>       { static constexpr char spec[] = "u"; };
+template <> struct printfmt<long>           { static constexpr char spec[] = "ld"; };
+template <> struct printfmt<unsigned long>  { static constexpr char spec[] = "lu"; };
+template <typename T> struct printfmt<T*>   { static constexpr char spec[] = "p"; };
+
+template <typename T> constexpr char printfmt<T*>::spec[];
 
 
 // Assertions

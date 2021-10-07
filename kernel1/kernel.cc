@@ -60,13 +60,13 @@ void kernel_start(const char* command) {
     console_clear();
 
     // (re-)initialize kernel page table:
-    // all of physical memory is accessible except `nullptr`
     for (vmiter it(kernel_pagetable);
          it.va() < MEMSIZE_PHYSICAL;
          it += PAGESIZE) {
         if (it.va() != 0) {
             it.map(it.va(), PTE_P | PTE_W | PTE_U);
         } else {
+            // nullptr is inaccessible even to the kernel
             it.map(it.va(), 0);
         }
     }

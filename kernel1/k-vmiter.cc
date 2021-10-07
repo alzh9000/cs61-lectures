@@ -84,7 +84,7 @@ int vmiter::try_map(uintptr_t pa, int perm) {
 
     while (level_ > 0 && perm) {
         assert(!(*pep_ & PTE_P));
-	return -1;
+        return -1;
     }
 
     if (level_ == 0) {
@@ -94,8 +94,10 @@ int vmiter::try_map(uintptr_t pa, int perm) {
 }
 
 
-ptiter::ptiter(x86_64_pagetable* pt)
-    : pt_(pt), pep_(&pt_->entry[0]), level_(3), va_(0) {
+void ptiter::go(uintptr_t va) {
+    level_ = 3;
+    pep_ = &pt_->entry[pageindex(va, level_)];
+    va_ = va;
     down(false);
 }
 

@@ -885,21 +885,23 @@ void assert_fail(const char* file, int line, const char* msg,
 //    Types representing program images. For documentation, please see
 //    `kernel.hh`.
 
-extern uint8_t _binary_obj_p_eve_start[];
-extern uint8_t _binary_obj_p_eve_end[];
-extern uint8_t _binary_obj_p_alice_start[];
-extern uint8_t _binary_obj_p_alice_end[];
-extern uint8_t _binary_obj_p_recurse_start[];
-extern uint8_t _binary_obj_p_recurse_end[];
+#define DECLARE_PROCESS_IMAGE_LOCATION(x) \
+    extern uint8_t _binary_obj_p_##x##_start[], _binary_obj_p_##x##_end[];
+#define DECLARE_PROCESS_IMAGE_RAMIMAGE(x) \
+    { #x, _binary_obj_p_##x##_start, _binary_obj_p_##x##_end },
+
+DECLARE_PROCESS_IMAGE_LOCATION(eve)
+DECLARE_PROCESS_IMAGE_LOCATION(alice)
+DECLARE_PROCESS_IMAGE_LOCATION(recurse)
 
 struct ramimage {
     const char* name;
     void* begin;
     void* end;
 } ramimages[] = {
-    { "eve", _binary_obj_p_eve_start, _binary_obj_p_eve_end },
-    { "alice", _binary_obj_p_alice_start, _binary_obj_p_alice_end },
-    { "recurse", _binary_obj_p_recurse_start, _binary_obj_p_recurse_end }
+    DECLARE_PROCESS_IMAGE_RAMIMAGE(eve)
+    DECLARE_PROCESS_IMAGE_RAMIMAGE(alice)
+    DECLARE_PROCESS_IMAGE_RAMIMAGE(recurse)
 };
 
 program_image::program_image(int program_number) {

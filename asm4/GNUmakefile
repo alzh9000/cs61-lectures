@@ -1,10 +1,10 @@
-PROGRAMS = ubsignedinc ubsignedinc2 checksummer deref
+PROGRAMS = ubsignedinc ubsignedinc2 checksummer deref print
 BUILDABLEASM := $(sort $(patsubst %.cc,%.s,$(wildcard f*.cc cc*.cc deref.cc)) \
         $(patsubst src/%.cc,%.s,$(wildcard src/f*.cc src/cc*.cc)))
 all: $(PROGRAMS) $(BUILDABLEASM) checksummer-unsafe
 
-BASEPROGRAMS = ubsignedinc ubsignedinc2 checksummer
-STATICPROGRAMS = deref
+BASEPROGRAMS = ubsignedinc ubsignedinc2 checksummer deref
+STATICPROGRAMS = print
 ALLPROGRAMS = $(PROGRAMS)
 
 variants = $(1) $(addsuffix -noopt,$(1)) $(addsuffix -unsafe,$(1))
