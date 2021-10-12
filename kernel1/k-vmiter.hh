@@ -48,8 +48,14 @@ class vmiter {
     inline vmiter& find(uintptr_t va);
     // Advance to virtual address `va() + delta`; return `*this`
     inline vmiter& operator+=(intptr_t delta);
+    // Advance to virtual address `va() + 1`; return `*this`
+    inline vmiter& operator++();
+    inline void operator++(int);
     // Advance to virtual address `va() - delta`; return `*this`
     inline vmiter& operator-=(intptr_t delta);
+    // Advance to virtual address `va() - 1`; return `*this`
+    inline vmiter& operator--();
+    inline void operator--(int);
     // Move to next larger page-aligned virtual address, skipping large
     // non-present regions
     void next();
@@ -99,7 +105,7 @@ class vmiter {
 class ptiter {
   public:
     // Initialize a physical iterator for `pt` with initial virtual address 0.
-    inline ptiter(x86_64_pagetable* pt);
+    ptiter(x86_64_pagetable* pt);
     inline ptiter(const proc* p);
 
     // Return true once `ptiter` has iterated over all page table pages
@@ -135,7 +141,6 @@ class ptiter {
     int level_;
     uintptr_t va_;
 
-    void go(uintptr_t va);
     void down(bool skip);
 };
 
@@ -200,8 +205,20 @@ inline vmiter& vmiter::find(uintptr_t va) {
 inline vmiter& vmiter::operator+=(intptr_t delta) {
     return find(va_ + delta);
 }
+inline vmiter& vmiter::operator++() {
+    return find(va_ + 1);
+}
+inline void vmiter::operator++(int) {
+    find(va_ + 1);
+}
 inline vmiter& vmiter::operator-=(intptr_t delta) {
     return find(va_ - delta);
+}
+inline vmiter& vmiter::operator--() {
+    return find(va_ - 1);
+}
+inline void vmiter::operator--(int) {
+    find(va_ - 1);
 }
 inline void vmiter::next_range() {
     real_find(last_va());
@@ -217,10 +234,6 @@ inline int vmiter::try_map(void* kp, int perm) {
     return try_map((uintptr_t) kp, perm);
 }
 
-inline ptiter::ptiter(x86_64_pagetable* pt)
-    : pt_(pt) {
-    go(0);
-}
 inline ptiter::ptiter(const proc* p)
     : ptiter(p->pagetable) {
 }

@@ -28,16 +28,11 @@ proc ptable[NPROC];             // array of process descriptors
 proc* current;                  // pointer to currently executing proc
 
 #define HZ 100                  // timer interrupt frequency (interrupts/sec)
-std::atomic<unsigned long> ticks; // # timer interrupts so far
+[[maybe_unused]] static std::atomic<unsigned long> ticks; // # timer interrupts so far
 
 
-// Memory state
-//    Information about physical page with address `pa` is stored in
-//    `pages[pa / PAGESIZE]`. In the handout code, each `pages` entry
-//    holds an `refcount` member, which is 0 for free pages.
-//    You can change this as you see fit.
-
-pageinfo pages[NPAGES];
+// Memory state - see `kernel.hh`
+physpageinfo physpages[NPAGES];
 
 
 [[noreturn]] void schedule();
@@ -59,7 +54,7 @@ void kernel_start(const char* command) {
     // clear screen
     console_clear();
 
-    // (re-)initialize kernel page table:
+    // (re-)initialize kernel page table
     for (vmiter it(kernel_pagetable);
          it.va() < MEMSIZE_PHYSICAL;
          it += PAGESIZE) {
@@ -112,8 +107,8 @@ void process_setup(pid_t pid, const char* program_name) {
              a < seg.va() + seg.size();
              a += PAGESIZE) {
             assert(a >= first_addr && a < last_addr);
-            assert(!pages[a / PAGESIZE].used());
-            pages[a / PAGESIZE].refcount = 1;
+            assert(physpages[a / PAGESIZE].refcount == 0);
+            physpages[a / PAGESIZE].refcount = 1;
             vmiter(ptable[pid].pagetable, a).map(a, PTE_P | PTE_W | PTE_U);
         }
     }
@@ -129,8 +124,8 @@ void process_setup(pid_t pid, const char* program_name) {
 
     // allocate stack
     uintptr_t stack_addr = last_addr - PAGESIZE;
-    assert(!pages[stack_addr / PAGESIZE].used());
-    pages[stack_addr / PAGESIZE].refcount = 1;
+    assert(physpages[stack_addr / PAGESIZE].refcount == 0);
+    physpages[stack_addr / PAGESIZE].refcount = 1;
     ptable[pid].regs.reg_rsp = stack_addr + PAGESIZE;
 
     // allow process to control interrupts
@@ -176,14 +171,14 @@ void exception(regstate* regs) {
     case INT_PF: {
         // Analyze faulting address and access type.
         uintptr_t addr = rdcr2();
-        const char* entity = regs->reg_errcode & PFERR_USER
+        const char* entity = regs->reg_errcode & PTE_U
                 ? "Process" : "Kernel";
-        const char* operation = regs->reg_errcode & PFERR_WRITE
+        const char* operation = regs->reg_errcode & PTE_W
                 ? "write" : "read";
-        const char* problem = regs->reg_errcode & PFERR_PRESENT
-                ? "protection" : "missing";
+        const char* problem = regs->reg_errcode & PTE_P
+                ? "protection problem" : "missing page";
 
-        error_printf("%s %d page fault at %p (%s %s, rip=%p)!\n",
+        error_printf("%s %d page fault on %p (%s %s, rip=%p)!\n",
             entity, current->pid, addr, operation, problem, regs->reg_rip);
         goto unhandled;
     }
@@ -241,7 +236,7 @@ uintptr_t syscall(regstate* regs) {
     switch (regs->reg_rax) {
 
     case SYSCALL_PANIC:
-        panic(nullptr);         // does not return
+        user_panic(current);    // does not return
 
     case SYSCALL_GETPID:
         return current->pid;

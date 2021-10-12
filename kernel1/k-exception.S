@@ -51,7 +51,7 @@ exception_entry_\num:
         // push exception number
         pushq $\num
         // jump to exception entry point
-        jmp exception_entry
+        jmp _Z15exception_entryv
 
         // add that handler to the `.interrupt_descriptors` section
     .pushsection .interrupt_descriptors, "aw", @progbits
@@ -70,8 +70,8 @@ exception_handler %exception_number
 
 // Exception entry point
 //    Most exception handlers jump here.
-.globl exception_entry
-exception_entry:
+.globl _Z15exception_entryv
+_Z15exception_entryv:
         push %gs
         push %fs
         pushq %r15
@@ -138,8 +138,8 @@ _Z16exception_returnP4proc:
 // syscall_entry
 //    Kernel entry point for the `syscall` instruction
 
-        .globl syscall_entry
-syscall_entry:
+        .globl _Z13syscall_entryv
+_Z13syscall_entryv:
         movq %rsp, KERNEL_STACK_TOP - 16 // save entry %rsp to kernel stack
         movq $KERNEL_STACK_TOP, %rsp     // change to kernel stack
 

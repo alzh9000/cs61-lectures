@@ -19,7 +19,7 @@ struct program_image_segment;
 #define P_FREE      0                   // free slot
 #define P_RUNNABLE  1                   // runnable process
 #define P_BLOCKED   2                   // blocked process
-#define P_BROKEN    3                   // faulted process
+#define P_FAULTED   3                   // faulted process
 
 // Process descriptor type
 struct proc {
@@ -51,14 +51,23 @@ extern proc ptable[NPROC];
 // Virtual memory size
 #define MEMSIZE_VIRTUAL         0x300000
 
-struct pageinfo {
-    uint8_t refcount;
+// physpages
+//    Status of physical memory.
+//
+//    `physpages[I]` is a `physpageinfo` structure corresponding to the `I`th
+//    physical page (which contains physical addresses
+//    `[I*PAGESIZE,(I+1)*PAGESIZE)`). `physpages[I].refcount` represents the
+//    number of times physical page `I` is used.
+//
+//    The memory viewer relies on `refcount == 0` indicating free pages.
+struct physpageinfo {
+    uint8_t refcount = 0;
 
     bool used() const {
         return this->refcount != 0;
     }
 };
-extern pageinfo pages[NPAGES];
+extern physpageinfo physpages[NPAGES];
 
 
 // Segment selectors
@@ -123,13 +132,15 @@ void set_pagetable(x86_64_pagetable* pagetable);
 //    table. Panic if any of the invariants are false.
 void check_page_table_mappings(x86_64_pagetable* pagetable);
 
-// poweroff
-//    Turn off the virtual machine.
-[[noreturn]] void poweroff();
+// exception_entry
+//    Entry point for exceptions (interrupts, traps, and faults). Defined
+//    in `k-exception.S`; “called” only by hardware.
+void exception_entry();
 
-// reboot
-//    Reboot the virtual machine.
-[[noreturn]] void reboot();
+// syscall_entry
+//    Entry point for system calls (the `syscall` instruction). Defined in
+//    `k-exception.S`; “called” only by hardware.
+void syscall_entry();
 
 // exception_return
 //    Return from an exception to user mode: load the page table
@@ -237,12 +248,24 @@ struct program_image_segment {
 };
 
 
+// poweroff
+//    Turn off the virtual machine.
+[[noreturn]] void poweroff();
+
+// reboot
+//    Reboot the virtual machine.
+[[noreturn]] void reboot();
+
+// user_panic
+//    Panic initiated by a user process.
+[[noreturn]] void user_panic(proc* p);
+
+
 // log_printf, log_vprintf
 //    Print debugging messages to the host's `log.txt` file. We run QEMU
 //    so that messages written to the QEMU "parallel port" end up in `log.txt`.
 __noinline void log_printf(const char* format, ...);
 __noinline void log_vprintf(const char* format, va_list val);
-
 
 // log_backtrace
 //    Print a backtrace to the host's `log.txt` file, either for the current
@@ -250,6 +273,10 @@ __noinline void log_vprintf(const char* format, va_list val);
 void log_backtrace(const char* prefix = "");
 void log_backtrace(const char* prefix, uintptr_t rsp, uintptr_t rbp);
 
+// lookup_symbol
+//    Read the hidden symbol table for the name of the kernel symbol at
+//    `addr`, storing the name in `*name` and the starting address in `*start`.
+//    Returns true if found.
 __no_asan
 bool lookup_symbol(uintptr_t addr, const char** name, uintptr_t* start);
 

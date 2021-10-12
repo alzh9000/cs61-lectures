@@ -22,8 +22,6 @@ static void init_interrupts();
 static void init_constructors();
 static void init_cpu_hardware();
 static void stash_kernel_data(bool restore);
-extern "C" { extern void exception_entry(); }
-extern "C" { extern void syscall_entry(); }
 
 void init_hardware() {
     // initialize kernel virtual memory structures
@@ -640,7 +638,9 @@ bool lookup_symbol(uintptr_t addr, const char** name, uintptr_t* start) {
         size_t m = l + ((r - l) >> 1);
         auto& sym = symtab.sym[m];
         if (sym.st_value <= addr
-            && (m + 1 == symtab.nsym || addr < (&sym)[1].st_value)
+            && (m + 1 == symtab.nsym
+                ? addr < sym.st_value + 0x1000
+                : addr < (&sym)[1].st_value)
             && (sym.st_size == 0 || addr <= sym.st_value + sym.st_size)) {
             if (!sym.st_value) {
                 return false;
@@ -860,13 +860,30 @@ void panic(const char* format, ...) {
     fail();
 }
 
-void panic_at(uintptr_t rsp, uintptr_t rbp, uintptr_t rip,
-              const char* format, ...) {
+[[noreturn]]
+static void panic(uintptr_t rsp, uintptr_t rbp, uintptr_t rip,
+                  const char* format, ...) {
     va_list val;
     va_start(val, format);
     vpanic(rsp, rbp, rip, format, val);
     va_end(val);
     fail();
+}
+
+void user_panic(proc* p) {
+    char s[256];
+    memset(s, 0, sizeof(s));
+    if (p->regs.reg_rdi == 0) {
+        strcpy(s, "(null)");
+    } else {
+        vmiter it(p->pagetable, p->regs.reg_rdi);
+        for (size_t i = 0;
+             i < sizeof(s) - 1 && it.va() >= PROC_START_ADDR && it.user();
+             ++i, ++it) {
+            s[i] = *it.kptr<const char*>();
+        }
+    }
+    panic(p->regs.reg_rsp, p->regs.reg_rbp, p->regs.reg_rip, "%s", s);
 }
 
 void assert_fail(const char* file, int line, const char* msg,

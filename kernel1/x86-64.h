@@ -79,11 +79,11 @@ typedef struct __attribute__((aligned(PAGESIZE))) x86_64_pagetable {
 
 // Page fault error flags
 // These bits are stored in x86_registers::reg_errcode after a page fault.
-#define PFERR_PRESENT   0x1             // Fault happened due to a protection
-                                        //   violation (rather than due to a
-                                        //   missing page)
-#define PFERR_WRITE     0x2             // Fault happened on a write
-#define PFERR_USER      0x4             // Fault happened in user context
+#define PFERR_PRESENT   PTE_P       // Fault happened due to a protection
+                                    //   violation (rather than due to a
+                                    //   missing page)
+#define PFERR_WRITE     PTE_W       // Fault happened on a write
+#define PFERR_USER      PTE_U       // Fault happened in user context
 
 
 // Interrupt numbers

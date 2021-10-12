@@ -77,12 +77,22 @@ $(OBJDIR)/bootentry.o: $(OBJDIR)/%.o: \
 $(OBJDIR)/%.uo: %.cc $(BUILDSTAMPS)
 	$(call cxxcompile,$(CXXFLAGS) -O1 -DWEENSYOS_PROCESS -c $< -o $@,COMPILE $<)
 
+$(OBJDIR)/%.uo: %.S $(OBJDIR)/u-asm.h $(BUILDSTAMPS)
+	$(call assemble,-O2 -c $< -o $@,ASSEMBLE $<)
+
 
 # How to make supporting source files
 
 $(OBJDIR)/k-asm.h: kernel.hh lib.hh types.h x86-64.h build/mkkernelasm.awk $(KERNELBUILDSTAMPS)
 	$(call cxxcompile,-dM -E kernel.hh | awk -f build/mkkernelasm.awk | sort > $@,CREATE $@)
 	@if test ! -s $@; then echo '* Error creating $@!' 1>&2; exit 1; fi
+
+$(OBJDIR)/u-asm.h: u-lib.hh lib.hh types.h x86-64.h build/mkkernelasm.awk $(BUILDSTAMPS)
+	$(call cxxcompile,-dM -E u-lib.hh | awk -f build/mkkernelasm.awk | sort > $@,CREATE $@)
+	@if test ! -s $@; then echo '* Error creating $@!' 1>&2; exit 1; fi
+
+$(OBJDIR)/k-foreachimage.h: build/mkforeachimage.awk $(PROCESSES_BUILDSTAMP)
+	$(call run,awk -f build/mkforeachimage.awk -v processes="$(PROCESSES)" > $@,CREATE $@)
 
 
 # How to make binaries and the boot sector

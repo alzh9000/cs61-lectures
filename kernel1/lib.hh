@@ -283,14 +283,14 @@ struct printer {
 // error_printf(cursor, color, format, ...)
 //    Like `console_printf`, but `color` defaults to `COLOR_ERROR`, and
 //    in the kernel, the message is also printed to the log.
-int error_printf(int cpos, int color, const char* format, ...)
-    __attribute__((noinline, cold));
-int error_vprintf(int cpos, int color, const char* format, va_list val)
-    __attribute__((noinline, cold));
-void error_printf(int color, const char* format, ...)
-    __attribute__((noinline, cold));
-void error_printf(const char* format, ...)
-    __attribute__((noinline, cold));
+[[gnu::noinline, gnu::cold]]
+int error_printf(int cpos, int color, const char* format, ...);
+[[gnu::noinline, gnu::cold]]
+int error_vprintf(int cpos, int color, const char* format, va_list val);
+[[gnu::noinline, gnu::cold]]
+void error_printf(int color, const char* format, ...);
+[[gnu::noinline, gnu::cold]]
+void error_printf(const char* format, ...);
 
 
 // Type information
@@ -324,7 +324,7 @@ template <typename T> constexpr char printfmt<T*>::spec[];
             assert_fail(__FILE__, __LINE__, #x, ## __VA_ARGS__);        \
         }                                                               \
     } while (false)
-__attribute__((noinline, noreturn, cold))
+[[noreturn, gnu::noinline, gnu::cold]]
 void assert_fail(const char* file, int line, const char* msg,
                  const char* description = nullptr);
 
@@ -347,9 +347,9 @@ void assert_fail(const char* file, int line, const char* msg,
 #define assert_ge(x, y) assert_op(x, >=, y)
 
 template <typename T>
-void __attribute__((noinline, noreturn, cold))
-assert_op_fail(const char* file, int line, const char* msg,
-               const T& x, const char* op, const T& y) {
+[[noreturn, gnu::noinline, gnu::cold]]
+void assert_op_fail(const char* file, int line, const char* msg,
+                    const T& x, const char* op, const T& y) {
     char fmt[48];
     snprintf(fmt, sizeof(fmt), "%%s:%%d: expected %%%s %s %%%s\n",
              printfmt<T>::spec, op, printfmt<T>::spec);
@@ -366,14 +366,14 @@ assert_op_fail(const char* file, int line, const char* msg,
             assert_memeq_fail(__FILE__, __LINE__, "memcmp(" #x ", " #y ", " #sz ") == 0", __x, __y, __sz); \
         }                                                               \
     } while (0)
-void __attribute__((noinline, noreturn, cold))
-assert_memeq_fail(const char* file, int line, const char* msg,
-                  const char* x, const char* y, size_t sz);
+[[noreturn, gnu::noinline, gnu::cold]]
+void assert_memeq_fail(const char* file, int line, const char* msg,
+                       const char* x, const char* y, size_t sz);
 
 
 // panic(format, ...)
 //    Print the message determined by `format` and fail.
-void __attribute__((noinline, noreturn, cold))
-panic(const char* format, ...);
+[[noreturn, gnu::noinline, gnu::cold]]
+void panic(const char* format, ...);
 
 #endif /* !WEENSYOS_LIB_HH */
