@@ -155,8 +155,8 @@ void exception(regstate* regs) {
 
     // It can be useful to log events using `log_printf`.
     // Events logged this way are stored in the host's `log.txt` file.
-    /* log_printf("proc %d: exception %d at rip %p\n",
-                current->pid, regs->reg_intno, regs->reg_rip); */
+    //log_printf("proc %d: exception %d at rip %p\n",
+    //           current->pid, regs->reg_intno, regs->reg_rip);
 
     // Show the current cursor location.
     console_show_cursor(cursorpos);
@@ -222,8 +222,8 @@ uintptr_t syscall(regstate* regs) {
 
     // It can be useful to log events using `log_printf`.
     // Events logged this way are stored in the host's `log.txt` file.
-    /* log_printf("proc %d: syscall %d at rip %p\n",
-                  current->pid, regs->reg_rax, regs->reg_rip); */
+    //log_printf("proc %d: syscall %d at rip %p\n",
+    //           current->pid, regs->reg_rax, regs->reg_rip);
 
     // Show the current cursor location.
     console_show_cursor(cursorpos);

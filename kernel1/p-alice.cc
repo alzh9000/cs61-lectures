@@ -1,11 +1,11 @@
 #include "u-lib.hh"
 
 void process_main() {
-    unsigned i = 0;
+    unsigned n = 0;
     while (true) {
-        ++i;
-        if (i % 1024 == 0) {
-            console_printf(0x0F00, "Hi, I'm Alice! #%d\n", i / 512);
+        ++n;
+        if (n % 1024 == 0) {
+            console_printf(0x0F00, "Hi, I'm Alice! #%u\n", n);
         }
         sys_yield();
     }

@@ -36,6 +36,9 @@ endif
 ifneq ($(NOGDB),1)
 QEMUGDB ?= -gdb tcp::12949
 endif
+ifeq ($(STOP),1)
+QEMUOPT += -S
+endif
 
 
 # Sets of object files
@@ -186,6 +189,6 @@ run-gdb-graphic-$(RUNSUFFIX): run-gdb-graphic
 run-gdb-console-$(RUNSUFFIX): run-gdb-console
 
 # Kill all my qemus
-kill:
+stop kill:
 	-killall -u $$(whoami) $(QEMU)
 	@sleep 0.2; if ps -U $$(whoami) | grep $(QEMU) >/dev/null; then killall -9 -u $$(whoami) $(QEMU); fi

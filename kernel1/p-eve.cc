@@ -5,11 +5,11 @@ void process_main() {
     sys_getsysname(buf);
     console_printf(0x0F00, "This is %s.\n", buf);
 
-    unsigned i = 0;
+    unsigned n = 0;
     while (true) {
-        ++i;
-        if (i % 1024 == 0) {
-            console_printf(0x0E00, "Hi, I'm Eve! #%d\n", i / 512);
+        ++n;
+        if (n % 1024 == 0) {
+            console_printf(0x0E00, "Hi, I'm Eve! #%u\n", n);
         }
         sys_yield();
     }

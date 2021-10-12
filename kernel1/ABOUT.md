@@ -9,10 +9,13 @@ Quickstart: `make run` will run the OS using the [QEMU] emulator.
 Running the OS
 --------------
 
-`make run` will run the OS. Close the QEMU window, or type `q` inside
-it, to exit the OS.
+`make run` will run the OS. On Docker, the OS will run in your terminal
+window; on a Linux virtual machine, QEMU will open a new window. (`make
+run-console` will run the OS in the terminal window on any OS.)
 
-`make run-console` will run the OS in the console window.
+To exit the OS, type `q` into the terminal or QEMU window. Since this requires
+a semi-functioning kernel, it might not work for you; see
+[Troubleshooting](#troubleshooting) for other ways to kill the OS.
 
 WeensyOS creates a debug log in `log.txt`. Run `make LOG=stdio run` to
 redirect the debug log to the standard output, or `make
@@ -57,11 +60,15 @@ but only version 5 or later.
 Troubleshooting
 ---------------
 
-There are several ways to kill a recalcitrant QEMU (for instance, if your
+There are several ways to kill a recalcitrant WeensyOS (if, for instance, your
 OS has become unresponsive).
 
 * If QEMU is running in its own graphical window, then close the window. This
   will kill the embedded OS.
+
+* Open another terminal, change into the WeensyOS directory and run `make
+  kill` to stop all running QEMUs. If you are using Docker, you will need to
+  enter Docker via `../cs61-run-docker` before running `make kill`.
 
 * If QEMU is running in a terminal window (in Docker, for instance), then
   press `Alt-2`. This will bring up the QEMU Monitor, which looks like this:
