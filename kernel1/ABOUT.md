@@ -43,6 +43,7 @@ but only version 5 or later.
 2. Install Homebrew’s new GCC package: `brew install gcc`
 
 3. Install Homebrew’s QEMU: `brew install qemu`
+
 4. Tap [Sergio Benitez’s collection of cross-compilers](https://github.com/SergioBenitez/homebrew-osxct): `brew tap SergioBenitez/osxct`
 
 5. Install the `x86_64-unknown-linux-gnu` cross-compiler toolchain: `brew install x86_64-unknown-linux-gnu`
@@ -90,7 +91,7 @@ OS has become unresponsive).
     sequence.
 
 Run `make run-gdb` to start up the OS with support for GDB debugging.
-This will start the OS, but not GDB. You must run `gdb -x
+This will start the OS, but not GDB. You must run `gdb -ix
 build/weensyos.gdb` to connect to the running emulator; when GDB
 connects, it will stop the OS and wait for instructions.
 

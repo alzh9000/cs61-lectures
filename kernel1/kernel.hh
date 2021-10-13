@@ -115,7 +115,7 @@ bool reserved_physical_address(uintptr_t pa);
 bool allocatable_physical_address(uintptr_t pa);
 
 // kalloc_pagetable
-//    Allocate and initialize a new,e empty level-4 page table.
+//    Allocate and initialize a new, empty page table.
 x86_64_pagetable* kalloc_pagetable();
 
 // check_pagetable
