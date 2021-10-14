@@ -84,7 +84,13 @@ int vmiter::try_map(uintptr_t pa, int perm) {
 
     while (level_ > 0 && perm) {
         assert(!(*pep_ & PTE_P));
-        return -1;
+        x86_64_pagetable* pt = (x86_64_pagetable*) kalloc(PAGESIZE);
+        if (!pt) {
+            return -1;
+        }
+        memset(pt, 0, PAGESIZE);
+        *pep_ = (uintptr_t) pt | PTE_P | PTE_W | PTE_U;
+        down();
     }
 
     if (level_ == 0) {

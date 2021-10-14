@@ -109,7 +109,6 @@ void process_setup(pid_t pid, const char* program_name) {
             assert(a >= first_addr && a < last_addr);
             assert(physpages[a / PAGESIZE].refcount == 0);
             physpages[a / PAGESIZE].refcount = 1;
-            vmiter(ptable[pid].pagetable, a).map(a, PTE_P | PTE_W | PTE_U);
         }
     }
 
@@ -178,7 +177,8 @@ void exception(regstate* regs) {
         const char* problem = regs->reg_errcode & PTE_P
                 ? "protection problem" : "missing page";
 
-        error_printf("%s %d page fault on %p (%s %s, rip=%p)!\n",
+        error_printf(CPOS(24, 0), COLOR_ERROR,
+            "%s %d page fault on %p (%s %s, rip=%p)!\n",
             entity, current->pid, addr, operation, problem, regs->reg_rip);
         goto unhandled;
     }
@@ -271,6 +271,9 @@ void schedule() {
         pid = (pid + 1) % NPROC;
         if (ptable[pid].state == P_RUNNABLE) {
             run(&ptable[pid]);
+        }
+        if (spins > NPROC) {
+            panic("No runnable processes!");
         }
 
         // If Control-C was typed, exit the virtual machine.

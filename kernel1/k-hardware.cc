@@ -281,6 +281,28 @@ void init_timer(int rate) {
 }
 
 
+// kalloc(sz)
+//    Kernel memory allocator. Allocates `sz` contiguous bytes and
+//    returns a pointer to the allocated memory, or `nullptr` on failure.
+//
+//    On WeensyOS, `kalloc` is a page-based allocator: if `sz > PAGESIZE`
+//    the allocation fails; if `sz < PAGESIZE` it allocates a whole page
+//    anyway.
+
+void* kalloc(size_t sz) {
+    assert(sz <= PAGESIZE);
+    for (uintptr_t pa = PAGESIZE; pa < MEMSIZE_PHYSICAL; pa += PAGESIZE) {
+        if (allocatable_physical_address(pa)
+            && physpages[pa / PAGESIZE].refcount == 0) {
+            ++physpages[pa / PAGESIZE].refcount;
+            memset((void*) pa, 0xCC, PAGESIZE);
+            return (void*) pa;
+        }
+    }
+    return nullptr;
+}
+
+
 // kalloc_pagetable
 //    Allocate and return a new, empty page table.
 
@@ -736,6 +758,9 @@ int error_vprintf(int cpos, int color, const char* format, va_list val) {
     __builtin_va_copy(val2, val);
     log_vprintf(format, val2);
     va_end(val2);
+    if (cpos < 0 && cursorpos < CPOS(24, 0)) {
+        cursorpos = CPOS(24, 0);
+    }
     return console_vprintf(cpos, color, format, val);
 }
 
