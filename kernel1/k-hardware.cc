@@ -766,14 +766,18 @@ int error_vprintf(int cpos, int color, const char* format, va_list val) {
 
 
 // check_keyboard
-//    Check for the user typing a control key. 'a', 'e', 'r', and 'x' cause a
-//    soft reboot where the kernel runs alice, eve, recurse, or alice+eve,
-//    respectively. Control-C or 'q' exit the virtual machine. Returns key
-//    typed or -1 for no key.
+//    Check for the user typing a control key, namely:
+//    * 'a': Soft reboot to run p-alice.
+//    * 'e': Soft reboot to run p-eve.
+//    * 'f': Soft reboot to run p-alice and p-eve.
+//    * 'r': Soft reboot to run p-recurse.
+//    * 's': Soft reboot to run p-spawn.
+//    * 'q' or Control-C: Exit the virtual machine.
+//    Otherwise returns the key typed, or -1 if no key was typed.
 
 int check_keyboard() {
     int c = keyboard_readc();
-    if (c == 'a' || c == 'e' || c == 'r' || c == 'x') {
+    if (c == 'a' || c == 'e' || c == 'r' || c == 'f' || c == 's') {
         // Turn off the timer interrupt.
         init_timer(-1);
         // Install a temporary page table to carry us through the
@@ -789,13 +793,17 @@ int check_keyboard() {
         // though it will get overwritten as the kernel runs.
         uint32_t multiboot_info[5];
         multiboot_info[0] = 4;
-        const char* argument = "aliceandeve";
+        const char* argument = "friends";
         if (c == 'a') {
             argument = "alice";
         } else if (c == 'e') {
             argument = "eve";
+        } else if (c == 'f' || c == 'x') {
+            argument = "friends";
         } else if (c == 'r') {
             argument = "recurse";
+        } else if (c == 's') {
+            argument = "spawn";
         }
         uintptr_t argument_ptr = (uintptr_t) argument;
         assert(argument_ptr < 0x100000000L);
@@ -935,6 +943,7 @@ void assert_fail(const char* file, int line, const char* msg,
 DECLARE_PROCESS_IMAGE_LOCATION(eve)
 DECLARE_PROCESS_IMAGE_LOCATION(alice)
 DECLARE_PROCESS_IMAGE_LOCATION(recurse)
+DECLARE_PROCESS_IMAGE_LOCATION(spawn)
 
 struct ramimage {
     const char* name;
@@ -944,6 +953,7 @@ struct ramimage {
     DECLARE_PROCESS_IMAGE_RAMIMAGE(eve)
     DECLARE_PROCESS_IMAGE_RAMIMAGE(alice)
     DECLARE_PROCESS_IMAGE_RAMIMAGE(recurse)
+    DECLARE_PROCESS_IMAGE_RAMIMAGE(spawn)
 };
 
 program_image::program_image(int program_number) {

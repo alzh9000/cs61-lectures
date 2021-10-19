@@ -1,6 +1,7 @@
 #include "kernel.hh"
 #include "k-apic.hh"
 #include "k-vmiter.hh"
+#include "obj/k-firstprocess.h"
 #include <atomic>
 
 // kernel.cc
@@ -71,14 +72,16 @@ void kernel_start(const char* command) {
         ptable[i].pid = i;
         ptable[i].state = P_FREE;
     }
-    if (command && !program_image(command).empty()) {
+    if (!command) {
+        command = WEENSYOS_FIRST_PROCESS;
+    }
+    if (!program_image(command).empty()) {
         process_setup(1, command);
-        run(&ptable[1]);
     } else {
         process_setup(1, "alice");
         process_setup(2, "eve");
-        run(&ptable[2]);
     }
+    run(&ptable[1]);
 }
 
 
@@ -108,7 +111,7 @@ void process_setup(pid_t pid, const char* program_name) {
              a += PAGESIZE) {
             assert(a >= first_addr && a < last_addr);
             assert(physpages[a / PAGESIZE].refcount == 0);
-            physpages[a / PAGESIZE].refcount = 1;
+            ++physpages[a / PAGESIZE].refcount;
         }
     }
 
@@ -124,7 +127,7 @@ void process_setup(pid_t pid, const char* program_name) {
     // allocate stack
     uintptr_t stack_addr = last_addr - PAGESIZE;
     assert(physpages[stack_addr / PAGESIZE].refcount == 0);
-    physpages[stack_addr / PAGESIZE].refcount = 1;
+    ++physpages[stack_addr / PAGESIZE].refcount;
     ptable[pid].regs.reg_rsp = stack_addr + PAGESIZE;
 
     // allow process to control interrupts
@@ -225,7 +228,7 @@ uintptr_t syscall(regstate* regs) {
     //log_printf("proc %d: syscall %d at rip %p\n",
     //           current->pid, regs->reg_rax, regs->reg_rip);
 
-    // Show the current cursor location.
+    // Show the current cursor location
     console_show_cursor(cursorpos);
 
     // If Control-C was typed, exit the virtual machine.

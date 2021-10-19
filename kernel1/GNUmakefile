@@ -51,15 +51,33 @@ KERNEL_OBJS = $(OBJDIR)/k-exception.ko \
 	$(OBJDIR)/lib.ko
 KERNEL_LINKER_FILES = build/kernel.ld
 
-PROCESS_BINARIES = $(OBJDIR)/p-alice $(OBJDIR)/p-eve \
-	$(OBJDIR)/p-recurse
+PROCESSES = p-alice p-eve p-recurse p-spawn
 PROCESS_LIB_OBJS = $(OBJDIR)/lib.uo $(OBJDIR)/u-lib.uo
-PROCESS_OBJS = $(OBJDIR)/p-alice.uo $(OBJDIR)/p-eve.uo \
-	$(OBJDIR)/p-recurse.uo $(PROCESS_LIB_OBJS)
+PROCESS_OBJS = $(patsubst %,obj/%.uo,$(PROCESSES)) $(PROCESS_LIB_OBJS)
 PROCESS_LINKER_FILES = build/process.ld
 
 
 -include build/rules.mk
+
+
+# Define `WEENSYOS_FIRST_PROCESS` if appropriate
+RUNCMD_LASTWORD := $(filter run-%,$(MAKECMDGOALS))
+ifeq ($(words $(RUNCMD_LASTWORD)),1)
+RUNCMD_LASTWORD := $(lastword $(subst -, ,$(RUNCMD_LASTWORD)))
+ifneq ($(filter p-$(RUNCMD_LASTWORD),$(PROCESSES) p-friends p-pipe),)
+RUNSUFFIX := $(RUNCMD_LASTWORD)
+WEENSYOS_FIRST_PROCESS := $(RUNCMD_LASTWORD)
+endif
+endif
+WEENSYOS_FIRST_PROCESS ?= friends
+
+ifneq ($(strip $(WEENSYOS_FIRST_PROCESS)),$(DEP_WEENSYOS_FIRST_PROCESS))
+FIRST_PROCESS_BUILDSTAMP := $(shell echo "DEP_WEENSYOS_FIRST_PROCESS:=$(WEENSYOS_FIRST_PROCESS)" > $(DEPSDIR)/_first_process.d)
+$(OBJDIR)/k-firstprocess.h: always
+endif
+ifeq ($(wildcard $(OBJDIR)/k-firstprocess.h),)
+KERNELBUILDSTAMPS += $(OBJDIR)/k-firstprocess.h
+endif
 
 
 # How to make object files
@@ -94,11 +112,16 @@ $(OBJDIR)/u-asm.h: u-lib.hh lib.hh types.h x86-64.h build/mkkernelasm.awk $(BUIL
 	$(call cxxcompile,-dM -E u-lib.hh | awk -f build/mkkernelasm.awk | sort > $@,CREATE $@)
 	@if test ! -s $@; then echo '* Error creating $@!' 1>&2; exit 1; fi
 
+$(OBJDIR)/k-firstprocess.h:
+	$(call run,echo '#ifndef WEENSYOS_FIRST_PROCESS' >$@; echo '#define WEENSYOS_FIRST_PROCESS "$(WEENSYOS_FIRST_PROCESS)"' >>$@; echo '#endif' >>$@,CREATE $@)
+
 $(OBJDIR)/k-foreachimage.h: build/mkforeachimage.awk $(PROCESSES_BUILDSTAMP)
 	$(call run,awk -f build/mkforeachimage.awk -v processes="$(PROCESSES)" > $@,CREATE $@)
 
 
 # How to make binaries and the boot sector
+
+PROCESS_BINARIES = $(patsubst %,obj/%,$(PROCESSES))
 
 $(OBJDIR)/kernel.full: $(KERNEL_OBJS) $(PROCESS_BINARIES) $(KERNEL_LINKER_FILES)
 	$(call link,-T $(KERNEL_LINKER_FILES) -o $@ $(KERNEL_OBJS) -b binary $(PROCESS_BINARIES),LINK)
@@ -106,8 +129,9 @@ $(OBJDIR)/kernel.full: $(KERNEL_OBJS) $(PROCESS_BINARIES) $(KERNEL_LINKER_FILES)
 $(OBJDIR)/p-%.full: $(OBJDIR)/p-%.uo $(PROCESS_LIB_OBJS) $(PROCESS_LINKER_FILES)
 	$(call link,-T $(PROCESS_LINKER_FILES) -o $@ $< $(PROCESS_LIB_OBJS),LINK)
 
-$(OBJDIR)/p-eve.full: $(OBJDIR)/p-eve.uo $(PROCESS_LIB_OBJS) build/p-eve.ld
-	$(call link,-T build/p-eve.ld -o $@ $< $(PROCESS_LIB_OBJS),LINK)
+$(OBJDIR)/p-eve.full $(OBJDIR)/p-spawn.full: \
+$(OBJDIR)/p-%.full: $(OBJDIR)/p-%.uo $(PROCESS_LIB_OBJS) build/process2.ld
+	$(call link,-T build/process2.ld -o $@ $< $(PROCESS_LIB_OBJS),LINK)
 
 $(OBJDIR)/kernel: $(OBJDIR)/kernel.full $(OBJDIR)/mkchickadeesymtab
 	$(call run,$(OBJDUMP) -C -S -j .text -j .ctors $< >$@.asm)
@@ -165,7 +189,7 @@ QEMUIMG = -M q35 \
 run: run-$(QEMUDISPLAY)
 	@:
 run-gdb-report:
-	@if test "$(QEMUGDB)" = "-gdb tcp::12949"; then echo '* Run `gdb -x build/weensyos.gdb` to connect gdb to qemu.' 1>&2; fi
+	@if test "$(QEMUGDB)" = "-gdb tcp::12949"; then echo '* Run `gdb -ix build/weensyos.gdb` to connect gdb to qemu.' 1>&2; fi
 run-graphic: $(QEMUIMAGEFILES) check-qemu run-gdb-report
 	$(call run,$(QEMU_PRELOAD) $(QEMU) $(QEMUOPT) $(QEMUGDB) $(QEMUIMG),QEMU $<)
 run-console: $(QEMUIMAGEFILES) check-qemu-console run-gdb-report
