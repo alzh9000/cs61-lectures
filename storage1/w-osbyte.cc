@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
             perror("write");
             exit(1);
         }
-        n += r;
+        ++n;
         if (n % PRINT_FREQUENCY == 0) {
             report(n);
         }

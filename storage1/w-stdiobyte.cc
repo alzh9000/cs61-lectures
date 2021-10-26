@@ -20,12 +20,12 @@ int main(int argc, char* argv[]) {
 
     size_t n = 0;
     while (n < size) {
-        size_t r = fwrite(buf, 1, 1, f);
-        if (r != 1) {
+        int ch = fputc(buf[0], f);
+        if (ch == EOF) {
             perror("write");
             exit(1);
         }
-        n += r;
+        ++n;
         if (n % PRINT_FREQUENCY == 0) {
             report(n);
         }
