@@ -1,4 +1,4 @@
-BASEPROGRAMS = $(sort $(patsubst %.cc,%,$(wildcard [rw]-*.cc)))
+BASEPROGRAMS = $(sort $(patsubst %.cc,%,$(wildcard [rw]-*.cc))) coherence
 PROGRAMS = $(BASEPROGRAMS)
 all: $(PROGRAMS) $(DATAFILE)
 
