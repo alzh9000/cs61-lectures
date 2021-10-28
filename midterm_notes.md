@@ -1,0 +1,3 @@
+* We probably shouldn't use GDB on the midterm due to time constraints
+* We should learn/memorize some of the basic assembly commands and registers (ex: rdi, rsi, movl) because it saves us a lot of time if we don't have to always reference that
+* We should focus on the data rep and assembly units. There probably won't be relatively as many questions on the kernel unit (and it would only cover the lectures up until the midterm start date).
