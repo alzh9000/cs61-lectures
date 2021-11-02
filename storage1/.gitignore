@@ -3,6 +3,7 @@ coherence
 data
 [rw]-syncbyte
 [rw]-syncblock
+[rw]-mmapbyte
 [rw]-osbyte
 [rw]-osbyterev
 [rw]-osblock
