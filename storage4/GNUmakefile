@@ -13,7 +13,8 @@ include ../common/rules.mk
 %.o: %.cc $(BUILDSTAMP)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(DEPCFLAGS) $(O) -o $@ -c $<
 
-accessor list-inserter matrixmultiply matrixmultiply-base matrixmultiply-transpose: \
+accessor list-inserter fork1 fork2 fork3 forkmix \
+matrixmultiply matrixmultiply-base matrixmultiply-transpose: \
 %: %.o hexdump.o
 	$(CXX) $(CXXFLAGS) $(O) $(LDFLAGS) -o $@ $^ $(LIBS)
 
