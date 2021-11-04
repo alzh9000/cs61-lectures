@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
 
-    char* file_data = (char*) mmap(nullptr, size, PROT_WRITE, MAP_SHARED, fd, 0);
+    char* file_data = (char*) mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (file_data == (char*) MAP_FAILED) {
         perror("mmap");
         exit(1);
