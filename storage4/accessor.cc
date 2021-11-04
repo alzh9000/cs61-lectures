@@ -6,12 +6,6 @@
 int main(int argc, char* argv[]) {
     constexpr size_t size = 100000000;
 
-    // initialize a very large array of integers
-    int* v = new int[size];
-    for (size_t i = 0; i != size; ++i) {
-        v[i] = rand();
-    }
-
     // check for access style argument
     int style = 'u';
     int opt;
@@ -19,6 +13,12 @@ int main(int argc, char* argv[]) {
         if (opt == 'r' || opt == 'd' || opt == 'u') {
             style = opt;
         }
+    }
+
+    // initialize a very large array of integers
+    int* v = new int[size];
+    for (size_t i = 0; i != size; ++i) {
+        v[i] = rand();
     }
 
     double t0 = cputime();
