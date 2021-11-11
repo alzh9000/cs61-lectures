@@ -1,6 +1,7 @@
 *.out
 coherence
 data
+r-exitbyte
 [rw]-syncbyte
 [rw]-syncblock
 [rw]-mmapbyte

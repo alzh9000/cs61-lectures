@@ -1,5 +1,5 @@
 PROGRAMS = forkmyecho myecho execmyecho spawnmyecho waitmyecho \
-	waitdemo childpipe forkorder pipesizer
+	waitdemo selfpipe childpipe forkorder pipesizer makezombies
 
 all: $(PROGRAMS)
 
