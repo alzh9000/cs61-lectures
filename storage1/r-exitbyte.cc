@@ -1,4 +1,5 @@
 #include "iobench.hh"
+#include <sys/wait.h>
 bool quiet = false;
 double start_tstamp;
 
