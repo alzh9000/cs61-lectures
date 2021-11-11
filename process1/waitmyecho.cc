@@ -17,7 +17,7 @@ int main() {
     assert(p >= 0);
     if (p == 0) {
         int r = execv("./myecho", (char**) args);
-    assert(r < 0);
+        assert(r < 0);
         fprintf(stderr, "Error: execv returned %d in pid %d\n", r, getpid());
         exit(1);
     }
@@ -28,10 +28,10 @@ int main() {
     pid_t w = waitpid(p, &status, 0);
     assert(w == p);
     if (WIFEXITED(status)) {
-    fprintf(stderr, "waitmyecho[%d]: child pid %d exited with status %d\n",
-        getpid(), w, WEXITSTATUS(status));
+        fprintf(stderr, "waitmyecho[%d]: child pid %d exited with status %d\n",
+                getpid(), w, WEXITSTATUS(status));
     } else {
-    fprintf(stderr, "waitmyecho[%d]: child pid %d exited abnormally [%x]\n",
-        getpid(), w, status);
+        fprintf(stderr, "waitmyecho[%d]: child pid %d exited abnormally [%x]\n",
+                getpid(), w, status);
     }
 }

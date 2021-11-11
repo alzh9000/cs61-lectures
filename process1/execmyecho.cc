@@ -15,5 +15,5 @@ int main() {
 
     int r = execv("./myecho", (char**) childargs);
     fprintf(stderr, "execmyecho[%d]: exec returned %d\n",
-        getpid(), r);
+            getpid(), r);
 }
