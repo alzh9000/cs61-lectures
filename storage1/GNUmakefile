@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 BASEPROGRAMS = $(sort $(patsubst %.cc,%,$(wildcard [rw]-*.cc)))
+=======
+BASEPROGRAMS = $(sort $(patsubst %.cc,%,$(wildcard [rw]-*.cc))) coherence
+>>>>>>> 3564f1926423eea813da2a56dab9bb188e3260a2
 PROGRAMS = $(BASEPROGRAMS)
 all: $(PROGRAMS) $(DATAFILE)
 

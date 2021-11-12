@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 accessor
 add
 addin
@@ -8,3 +9,15 @@ testqs[0-9]
 qs
 qs.cmi
 qs.cmo
+=======
+accessor
+add
+addin
+inserter[0-9]
+intgen
+objects
+testqs[0-9]
+qs
+qs.cmi
+qs.cmo
+>>>>>>> 3564f1926423eea813da2a56dab9bb188e3260a2

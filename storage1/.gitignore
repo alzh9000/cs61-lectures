@@ -1,6 +1,16 @@
+<<<<<<< HEAD
 data
 [rw]-syncbyte
 [rw]-syncblock
+=======
+*.out
+coherence
+data
+r-exitbyte
+[rw]-syncbyte
+[rw]-syncblock
+[rw]-mmapbyte
+>>>>>>> 3564f1926423eea813da2a56dab9bb188e3260a2
 [rw]-osbyte
 [rw]-osbyterev
 [rw]-osblock

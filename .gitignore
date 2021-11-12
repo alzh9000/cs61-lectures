@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #*#
 *.aux
 *.backup
@@ -35,3 +36,42 @@ tags
 tags.*
 typescript
 vgcore*
+=======
+#*#
+*.aux
+*.backup
+*.core
+*.dSYM
+*.dvi
+*.gcda
+*.gch
+*.log
+*.noopt
+*.o
+*.optimized
+*.pch
+*.unsafe
+*.xcodeproj
+*~
+.DS_Store
+.cproject
+.deps
+.gitcheckout
+.goutputstream-*
+.hg
+.project
+.svn
+.vscode
+a.out
+core*
+cmake-build-*
+cscope.out
+pset.tgz
+pset[1-9].tgz
+pset[1-9]grade.tgz
+strace.out
+tags
+tags.*
+typescript
+vgcore*
+>>>>>>> 3564f1926423eea813da2a56dab9bb188e3260a2
