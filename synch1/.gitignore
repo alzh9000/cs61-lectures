@@ -4,6 +4,7 @@ incr-atomic
 incr-volatile
 incr-scopedlock
 incr-spinlock
+incr-spinlock2
 incr-mutex
 incr-trymutex
 *-noopt

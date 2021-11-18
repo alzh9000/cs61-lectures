@@ -6,13 +6,12 @@
 
 void threadfunc(std::atomic<int>* spinlock, unsigned* x) {
     for (int i = 0; i != 10000000; ++i) {
-        while (++*spinlock != 1) {
-	    --*spinlock;
+        while (spinlock->fetch_or(1) != 0) {
         }
 
         *x += 1;
 
-	--*spinlock;
+        *spinlock = 0;
     }
 }
 

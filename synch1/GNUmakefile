@@ -1,7 +1,7 @@
 PROGRAMS = threadexamples \
 	incr-basic incr-basic-noopt \
 	incr-volatile incr-atomic incr-mutex incr-scopedlock \
-	incr-trymutex incr-spinlock
+	incr-trymutex incr-spinlock incr-spinlock2
 
 all: $(PROGRAMS)
 
