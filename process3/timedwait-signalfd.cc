@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
 
     double start_time = tstamp();
 
-    // Start a child
+    // Start child
     pid_t p1 = fork();
     assert(p1 >= 0);
     if (p1 == 0) {

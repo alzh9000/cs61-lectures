@@ -8,7 +8,7 @@ int main(int argc, char** argv) {
 
     double start_time = tstamp();
 
-    // Start a child
+    // Start child
     pid_t p1 = fork();
     assert(p1 >= 0);
     if (p1 == 0) {
@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
         exit(0);
     }
 
-    // Wait for the child and print its status
+    // Wait for timeout or child exit, whichever happens first, by polling
     int status;
     pid_t exited_pid = 0;
     while (tstamp() - start_time < timeout && exited_pid == 0) {

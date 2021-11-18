@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
 
     double start_time = tstamp();
 
-    // Start a child
+    // Start child
     pid_t p1 = fork();
     assert(p1 >= 0);
     if (p1 == 0) {
@@ -29,13 +29,14 @@ int main(int argc, char** argv) {
         exit(0);
     }
 
-    // Wait for the child and print its status
+    // Set an alarm for `timeout` sec, after which kernel delivers SIGALRM
     struct itimerval itimer;
     timerclear(&itimer.it_interval);
     itimer.it_value = make_timeval(timeout);
     r = setitimer(ITIMER_REAL, &itimer, nullptr);
     assert(r >= 0);
 
+    // Wait for child to exit or alarm; alarm will interrupt `waitpid`
     int status;
     pid_t exited_pid = waitpid(p1, &status, 0);
 

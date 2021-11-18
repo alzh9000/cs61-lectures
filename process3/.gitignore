@@ -5,4 +5,5 @@ timedwait-blockvar
 timedwait-poll
 timedwait-selfpipe
 timedwait-selfpipe2
+timedwait-selectpipe
 timedwait-signalfd

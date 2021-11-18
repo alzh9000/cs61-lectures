@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
 
     double start_time = tstamp();
 
-    // Start a child
+    // Start child
     pid_t p1 = fork();
     assert(p1 >= 0);
     if (p1 == 0) {
@@ -31,11 +31,14 @@ int main(int argc, char** argv) {
         exit(0);
     }
 
-    // Wait for the child and print its status
+    // Wait for the timeout or child exit, if child hasn’t exited yet.
+    // `usleep` will either succeed, returning 0 after `timeout` sec,
+    // or be interrupted by SIGCHLD, returning -1. (Or will it?)
     if (!got_signal) {
         r = usleep((unsigned) (timeout * 1000000));
     }
 
+    // Check if child exited
     int status;
     pid_t exited_pid = waitpid(p1, &status, WNOHANG);
     assert(exited_pid == 0 || exited_pid == p1);

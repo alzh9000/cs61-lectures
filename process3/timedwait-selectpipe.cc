@@ -6,32 +6,24 @@ int signalpipe[2];
 
 void signal_handler(int signal) {
     (void) signal;
-    ssize_t r = write(signalpipe[1], "!", 1);
-    assert(r == 1);
-}
-
-void alarm_handler(int signal) {
-    (void) signal;
-    ssize_t r = write(signalpipe[1], "!", 1);
+    ssize_t r = write(signalpipe[1], "E", 1);
     assert(r == 1);
 }
 
 int main(int argc, char** argv) {
     parse_arguments(argc, argv);
 
-    // Set up the SIGCHLD handler and the signal pipe
+    // Create the signal pipe
     int r = pipe(signalpipe);
     assert(r >= 0);
-    r = set_signal_handler(SIGCHLD, signal_handler);
-    assert(r >= 0);
 
-    // Set up the SIGALRM handler
-    r = set_signal_handler(SIGALRM, alarm_handler);
+    // SIGCHLD writes `E` to the pipe
+    r = set_signal_handler(SIGCHLD, signal_handler);
     assert(r >= 0);
 
     double start_time = tstamp();
 
-    // Start a child
+    // Start child
     pid_t p1 = fork();
     assert(p1 >= 0);
     if (p1 == 0) {
@@ -46,16 +38,13 @@ int main(int argc, char** argv) {
 
     // Wait for `timeout` sec, or until a byte is written to `signalpipe`,
     // whichever happens first
-    struct itimerval itimer;
-    timerclear(&itimer.it_interval);
-    itimer.it_value = make_timeval(timeout);
-    r = setitimer(ITIMER_REAL, &itimer, nullptr);
-    assert(r >= 0);
+    fd_set fds;
+    FD_ZERO(&fds);
+    FD_SET(signalpipe[0], &fds);
+    struct timeval timeout_timeval = make_timeval(timeout);
+    r = select(signalpipe[0] + 1, &fds, nullptr, nullptr, &timeout_timeval);
 
-    char c;
-    ssize_t n = read(signalpipe[0], &c, 1);
-    (void) n;
-
+    // Check if child exited
     int status;
     pid_t exited_pid = waitpid(p1, &status, WNOHANG);
     assert(exited_pid == 0 || exited_pid == p1);

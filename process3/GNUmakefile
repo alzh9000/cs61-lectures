@@ -1,10 +1,10 @@
 PROGRAMS = timedwait-poll timedwait-block timedwait-blockvar \
-	timedwait-alarm timedwait-selfpipe timedwait-selfpipe2 \
+	timedwait-alarm timedwait-selfpipe timedwait-selectpipe \
 	timedwait-signalfd
 
 all: $(PROGRAMS)
 
-ALLPROGRAMS = $(PROGRAMS)
+ALLPROGRAMS = $(PROGRAMS) timedwait-selfpipe2
 
 O ?= 3
 include ../common/rules.mk
