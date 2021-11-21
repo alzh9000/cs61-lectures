@@ -1,0 +1,14 @@
+threadexamples
+incr-basic
+incr-atomic
+incr-volatile
+incr-scopedlock
+incr-spinlock
+incr-spinlock2
+incr-mutex
+incr-trymutex
+*-noopt
+*-gcc
+*-gcc-noopt
+*-clang
+*-clang-noopt
